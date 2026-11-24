@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Aures Bullet: Secret of the Traitor and the Colonizer | تامر Tteam</title>
+<style>
+  :root {
+    --bg-dark: #110c09;
+    --bg-wood: #261810;
+    --bg-wood-light: #3c2619;
+    --parchment: #ebdcb9;
+    --parchment-dark: #cbb282;
+    --ink: #1a110b;
+    --crimson: #8e1b1b;
+    --crimson-bright: #b92828;
+    --gold: #c79a3b;
+    --gold-light: #f0d484;
+    --olive: #3d4d2c;
+    --olive-light: #617847;
+    --font-serif: 'Amiri', 'Traditional Arabic', Georgia, serif;
+    --font-sans: 'Cairo', 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  input, textarea, select {
+    user-select: text;
+  }
+
+  button, .tac-btn, .vc-btn, .game-card, .domino-tile, .chess-sq, .team-16-card {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  button svg, .tac-btn svg, .game-card svg, #game-logo svg {
+    pointer-events: none;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% 20%, #2c1e15 0%, #140d09 65%, #080504 100%);
+    color: var(--parchment);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+
+  .atmosphere-fog {
+    position: fixed;
+    inset: 0;
+    pointer-events: none !important;
+    z-index: 1;
+    background:
+      radial-gradient(ellipse at 18% 82%, rgba(199, 154, 59, 0.07) 0%, transparent 55%),
+      radial-gradient(ellipse at 82% 18%, rgba(142, 27, 27, 0.09) 0%, transparent 50%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, transparent 2px, rgba(0,0,0,0.03) 4px);
+    animation: fogDrift 20s ease-in-out infinite alternate;
+  }
+  .vignette-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none !important;
+    z-index: 2;
+    box-shadow: inset 0 0 110px rgba(0,0,0,0.88);
+  }
+
+  @keyframes fogDrift {
+    0% { opacity: 0.72; transform: scale(1) translate(0, 0); }
+    100% { opacity: 1; transform: scale(1.04) translate(-1%, 1%); }
+  }
+  @keyframes floatSlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(199,154,59,0.28); }
+    50% { box-shadow: 0 0 22px rgba(240,212,132,0.58); }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  #splash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: radial-gradient(circle at center, #291a12 0%, #0d0805 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 20px;
+    text-align: center;
+    transition: opacity 0.3s ease;
+  }
+  #splash-screen.hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    display: none !important;
+    z-index: -1 !important;
+  }
+  .splash-bar-wrap {
+    width: 240px;
+    height: 7px;
+    background: #1d120c;
+    border: 1px solid var(--gold);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .splash-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--crimson), var(--gold-light));
+    transition: width 0.2s ease;
+  }
+
+  #voice-chat-bar {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: linear-gradient(180deg, #1d130e 0%, #100a07 100%);
+    border-bottom: 2px solid rgba(199, 154, 59, 0.48);
+    padding: 8px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.75);
+  }
+  .voice-status-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+  }
+  .voice-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #666;
+    display: inline-block;
+  }
+  .voice-dot.live {
+    background: #4cd964;
+    box-shadow: 0 0 8px #4cd964;
+  }
+  .voice-controls {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .vc-btn {
+    background: linear-gradient(180deg, #342217 0%, #20140d 100%);
+    color: var(--parchment);
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    padding: 6px 11px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .vc-btn:hover { background: #4a3122; transform: translateY(-1px); }
+  .vc-btn.active-on { background: var(--olive); border-color: #93c462; color: #fff; }
+  .vc-btn.muted { background: #5a1818; border-color: #e06c6c; color: #ffd9d9; }
+  .vc-btn.danger { background: var(--crimson); border-color: #ff7676; color: #fff; }
+
+  #ad-banner {
+    position: relative;
+    z-index: 45;
+    margin: 8px auto 0;
+    max-width: 980px;
+    width: calc(100% - 24px);
+    background: linear-gradient(90deg, #241710 0%, #342217 50%, #241710 100%);
+    border: 1px dashed var(--gold);
+    border-radius: 8px;
+    padding: 7px 40px 7px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.83rem;
+    color: var(--gold-light);
+  }
+  #ad-banner.hidden { display: none !important; }
+  #close-ad-btn {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(142, 27, 27, 0.92);
+    color: #fff;
+    border: 1px solid var(--gold-light);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #mini-ads-drawer {
+    position: fixed;
+    left: 14px;
+    bottom: 58px;
+    width: 295px;
+    max-width: calc(100vw - 28px);
+    z-index: 95;
+    background: linear-gradient(160deg, #271911 0%, #140c08 100%);
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.85);
+    display: none;
+    pointer-events: none;
+    animation: slideUp 0.25s ease;
+  }
+  #mini-ads-drawer.open {
+    display: block;
+    pointer-events: auto;
+  }
+
+  .ad-slot-box {
+    background: rgba(12, 8, 5, 0.82);
+    border: 1px dashed rgba(199, 154, 59, 0.55);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 8px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--parchment-dark);
+  }
+
+  #app-wrapper {
+    position: relative;
+    z-index: 15;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px 14px 34px;
+    min-height: calc(100vh - 125px);
+  }
+
+  .screen { display: none; animation: slideUp 0.28s ease; }
+  .screen.active { display: block !important; }
+
+  .dossier-panel {
+    background: linear-gradient(160deg, rgba(44, 29, 20, 0.95) 0%, rgba(22, 14, 9, 0.98) 100%);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.75), inset 0 0 26px rgba(199, 154, 59, 0.08);
+    position: relative;
+  }
+
+  .parchment-box {
+    background: linear-gradient(145deg, #efe2c6 0%, #d8c195 100%);
+    color: var(--ink);
+    border: 2px solid #7c5c2d;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5), inset 0 0 22px rgba(120, 82, 34, 0.22);
+  }
+
+  .tac-btn {
+    background: linear-gradient(180deg, #4b2f1f 0%, #2a180f 100%);
+    color: var(--parchment);
+    border: 1.5px solid var(--gold);
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-size: 0.96rem;
+    font-weight: 700;
+    font-family: inherit;
+    transition: all 0.22s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .tac-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 25%, rgba(240,212,132,0.18) 50%, transparent 75%);
+    transform: translateX(120%);
+    transition: transform 0.55s ease;
+    pointer-events: none !important;
+  }
+  .tac-btn:hover::after { transform: translateX(-120%); }
+  .tac-btn:hover { transform: translateY(-2px); border-color: var(--gold-light); box-shadow: 0 7px 18px rgba(199,154,59,0.34); }
+  .tac-btn:active { transform: translateY(0); }
+  .tac-btn.primary { background: linear-gradient(180deg, #9d2323 0%, #631111 100%); border-color: var(--gold-light); color: #fff8e7; }
+  .tac-btn.olive { background: linear-gradient(180deg, #4b5d36 0%, #2d3820 100%); border-color: #a9bd86; }
+  .tac-btn.gold { background: linear-gradient(180deg, #d7a846 0%, #9b701c 100%); color: #191008; border-color: #fff2c6; }
+  .tac-btn.danger { background: linear-gradient(180deg, #a82222 0%, #6d1111 100%); border-color: #ff9999; color: #fff; }
+  .tac-btn.small { padding: 7px 11px; font-size: 0.84rem; }
+
+  #screen-home { text-align: center; }
+  .home-hero {
+    background:
+      radial-gradient(circle at 50% 18%, rgba(199, 154, 59, 0.14) 0%, transparent 58%),
+      linear-gradient(180deg, rgba(31, 20, 14, 0.94) 0%, rgba(17, 11, 8, 0.97) 100%);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 22px 16px 24px;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.86);
+    position: relative;
+  }
+
+  #game-logo {
+    max-width: 340px;
+    width: 100%;
+    margin: 0 auto 8px;
+    filter: drop-shadow(0 6px 16px rgba(0,0,0,0.85));
+    animation: floatSlow 5s ease-in-out infinite;
+  }
+
+  .tteam-badge-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: rgba(14, 9, 6, 0.82);
+    border: 1px solid rgba(199, 154, 59, 0.55);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 0.88rem;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+  }
+
+  #main-menu-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+    gap: 11px;
+    max-width: 980px;
+    margin: 12px auto 0;
+  }
+  #main-menu-content .tac-btn { min-height: 52px; }
+
+  .secret-code-strip {
+    margin: 18px auto 0;
+    max-width: 660px;
+    background: rgba(12, 8, 5, 0.74);
+    border: 1px dashed rgba(199, 154, 59, 0.55);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .vintage-input {
+    background: #140d09;
+    color: var(--gold-light);
+    border: 1.5px solid var(--gold);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 0.94rem;
+    outline: none;
+  }
+  .vintage-input:focus { border-color: #fff1c1; box-shadow: 0 0 8px rgba(199,154,59,0.45); }
+
+  .setup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: right;
+  }
+  .form-group label { color: var(--gold-light); font-weight: 700; font-size: 0.9rem; }
+  .names-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .wooden-table {
+    background: radial-gradient(ellipse at 50% 45%, #4a2e1b 0%, #2a190f 65%, #170d07 100%);
+    border: 4px solid #6b4927;
+    outline: 2px solid var(--gold);
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.88), inset 0 0 70px rgba(0,0,0,0.65);
+  }
+  .game-hud-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(12, 8, 5, 0.74);
+    border: 1px solid rgba(199, 154, 59, 0.45);
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+  }
+  .hud-pill {
+    background: rgba(54, 34, 23, 0.92);
+    border: 1px solid var(--gold);
+    border-radius: 999px;
+    padding: 4px 11px;
+    font-size: 0.83rem;
+    color: var(--gold-light);
+  }
+
+  .players-ring {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(142px, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .seat-card {
+    background: linear-gradient(160deg, rgba(35, 22, 15, 0.94), rgba(19, 12, 8, 0.96));
+    border: 1.5px solid #6b4b2a;
+    border-radius: 10px;
+    padding: 8px;
+    font-size: 0.8rem;
+    transition: all 0.25s;
+  }
+  .seat-card.current-turn { border-color: var(--gold-light); animation: pulseGlow 1.8s infinite; }
+  .seat-card.eliminated { opacity: 0.45; filter: grayscale(0.8); border-style: dashed; }
+  .seat-card.shielded { border-color: #7ed957; box-shadow: inset 0 0 12px rgba(76, 217, 100, 0.35); }
+
+  .mini-card-backs { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 5px; }
+  .mini-back {
+    width: 24px;
+    height: 34px;
+    border-radius: 4px;
+    background: linear-gradient(145deg, #5d1515 0%, #2f0b0b 100%);
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6px;
+    color: var(--gold-light);
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.05;
+  }
+
+  .table-center {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    padding: 14px 10px;
+    background: rgba(14, 9, 6, 0.48);
+    border-radius: 14px;
+    border: 1px dashed rgba(199, 154, 59, 0.35);
+    margin-bottom: 12px;
+  }
+  .pile-slot { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+
+  .game-card {
+    width: 116px;
+    height: 168px;
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.65);
+    flex-shrink: 0;
+  }
+  .game-card:hover { transform: translateY(-7px) scale(1.03); box-shadow: 0 14px 24px rgba(199, 154, 59, 0.35); }
+  .game-card svg { width: 100%; height: 100%; display: block; border-radius: 10px; }
+
+  #player-hand {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(12, 8, 5, 0.58);
+    border-radius: 12px;
+    border: 1px solid rgba(199, 154, 59, 0.4);
+    min-height: 190px;
+  }
+
+  #narrator-box {
+    margin-top: 12px;
+    background: linear-gradient(90deg, rgba(30, 19, 13, 0.95), rgba(50, 31, 20, 0.95));
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  #narrator { color: var(--gold-light); font-size: 0.92rem; line-height: 1.5; flex: 1; }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 3, 2, 0.86);
+    z-index: 150;
+    display: none;
+    pointer-events: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-backdrop.open {
+    display: flex !important;
+    pointer-events: auto !important;
+  }
+  .modal-card {
+    background: linear-gradient(160deg, #2b1c14 0%, #160e0a 100%);
+    border: 2px solid var(--gold);
+    border-radius: 14px;
+    max-width: 720px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+  }
+
+  .secret-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .chess-board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    max-width: 440px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border: 4px solid #6b4927;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.75);
+    direction: ltr;
+  }
+  .chess-sq {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(20px, 5vw, 33px);
+    position: relative;
+  }
+  .chess-sq.light { background: #e6d3ad; }
+  .chess-sq.dark { background: #6b4428; }
+  .chess-sq.selected { background: #c79a3b !important; outline: 2px solid #fff3c4; }
+  .chess-sq.legal::after {
+    content: "";
+    width: 28%;
+    height: 28%;
+    border-radius: 50%;
+    background: rgba(142, 27, 27, 0.78);
+    position: absolute;
+    pointer-events: none;
+  }
+  .chess-piece-white { color: #fffaf0; text-shadow: 0 1px 3px #000, 0 0 2px #000; pointer-events: none; }
+  .chess-piece-black { color: #160e0a; text-shadow: 0 1px 1px rgba(255,255,255,0.4); pointer-events: none; }
+
+  .domino-chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 104px;
+    background: rgba(15, 30, 18, 0.85);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+    direction: ltr;
+  }
+  .domino-tile {
+    background: #f4ebd4;
+    color: #16100b;
+    border: 2px solid #4d361d;
+    border-radius: 7px;
+    padding: 5px 8px;
+    font-weight: 800;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    direction: ltr;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.45);
+  }
+  .domino-tile:hover { transform: translateY(-2px); border-color: var(--crimson); }
+  .domino-sep { width: 2px; height: 22px; background: #5a4024; }
+
+  .fb-menu-bar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 14px; }
+  .teams-16-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .team-16-card {
+    background: rgba(28, 18, 12, 0.92);
+    border: 1.5px solid #6b4b2a;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .team-16-card.selected {
+    border-color: #4cd964;
+    background: rgba(53, 74, 41, 0.9);
+    box-shadow: 0 0 12px rgba(76, 217, 100, 0.35);
+  }
+  #football-canvas {
+    width: 100%;
+    max-width: 720px;
+    height: auto;
+    border: 3px solid var(--gold);
+    border-radius: 10px;
+    background: #1f5c2e;
+    display: block;
+    margin: 0 auto;
+  }
+  .fb-touch-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; direction: ltr; }
+
+  .timeline-item {
+    border-right: 3px solid var(--crimson-bright);
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    background: rgba(20, 13, 9, 0.72);
+    border-radius: 0 8px 8px 0;
+  }
+
+  #official-footer {
+    position: relative;
+    z-index: 20;
+    text-align: center;
+    padding: 14px 12px;
+    background: linear-gradient(180deg, #160e0a 0%, #0b0705 100%);
+    border-top: 2px solid rgba(199, 154, 59, 0.45);
+    color: var(--gold-light);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    .game-card { width: 95px; height: 138px; }
+    .players-ring { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="atmosphere-fog"></div>
+<div class="vignette-overlay"></div>
+
+<div id="splash-screen" onclick="this.classList.add('hidden');this.style.display='none';">
+  <img src="logo.png" alt="Aures Bullet" style="display:none;max-width:220px;border-radius:12px;border:2px solid var(--gold);" onload="this.style.display='block';" onerror="this.style.display='none';">
+  <img src="tteam-logo.png" alt="تامر Tteam" style="display:none;width:64px;height:64px;border-radius:50%;border:2px solid var(--gold);" onload="this.style.display='block';" onerror="this.style.display='none';">
+  <svg width="88" height="88" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="45" fill="#23160f" stroke="#c79a3b" stroke-width="3"/>
+    <path d="M18,70 L38,40 L52,55 L68,30 L84,70 Z" fill="#8e1b1b" stroke="#f0d484" stroke-width="1.5"/>
+    <text x="50" y="84" text-anchor="middle" fill="#f0d484" font-size="11" font-family="Georgia,serif">Tteam</text>
+  </svg>
+  <h2 style="margin:0;color:var(--gold-light);font-family:var(--font-serif);">Aures Bullet: Secret of the Traitor and the Colonizer</h2>
+  <p style="margin:0;color:var(--parchment-dark);font-size:0.9rem;">تامر Tteam © 2026 - جاري تهيئة أرشيف الأوراس...</p>
+  <div class="splash-bar-wrap"><div class="splash-bar-fill" id="splash-fill"></div></div>
+  <button type="button" class="tac-btn small gold" id="btn-skip-splash">دخول مباشر</button>
+</div>
+
+<header id="voice-chat-bar">
+  <div class="voice-status-group">
+    <span class="voice-dot" id="vc-dot"></span>
+    <span id="vc-status-text">الاتصال الصوتي للخلية: غير متصل</span>
+  </div>
+  <div class="voice-controls">
+    <button type="button" class="vc-btn" id="btn-vc-mic">🎙️ الميكروفون: مغلق</button>
+    <button type="button" class="vc-btn active-on" id="btn-vc-speaker">🔊 الصوت والراوي: مفعل</button>
+    <button type="button" class="vc-btn danger" id="btn-vc-leave">📵 مغادرة المكالمة</button>
+    <button type="button" class="vc-btn" id="btn-toggle-mini-ads">📢 قائمة الإعلانات الصغيرة</button>
+  </div>
+</header>
+
+<div id="ad-banner">
+  <span id="ad-banner-text">📢 <strong>مساحة رعاية مهيأة:</strong> يمكنك ربط إعلان Google AdSense أو رسالة راعٍ مخصصة من "قائمة الإعلانات الصغيرة".</span>
+  <button type="button" id="close-ad-btn" aria-label="إغلاق الإعلان">×</button>
+</div>
+
+<aside id="mini-ads-drawer" aria-label="قائمة الإعلانات الصغيرة">
+  <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(199,154,59,0.35);padding-bottom:6px;">
+    <strong style="color:var(--gold-light);font-size:0.9rem;">📢 قائمة الإعلانات الصغيرة</strong>
+    <button type="button" class="vc-btn danger" id="btn-close-mini-ads" style="padding:2px 8px;">✕ إغلاق</button>
+  </div>
+  <div id="mini-ad-render-slot" class="ad-slot-box">
+    <strong>حالة الشبكة الإعلانية:</strong><br>
+    لم يتم ربط شيفرة إعلانية خارجية (مثل Google AdSense) بعد في وضع التشغيل المستقل. هذه الحاوية مهيأة تماماً لاستقبال كود الإعلان الفعلي عند النشر.
+  </div>
+  <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+    <button type="button" class="tac-btn small gold" id="btn-open-ad-settings" style="flex:1;">⚙️ تخصيص وإدارة الإعلانات</button>
+  </div>
+</aside>
+
+<main id="app-wrapper">
+
+  <section id="screen-home" class="screen active">
+    <div class="home-hero">
+      <div id="game-logo">
+        <img src="logo.png" alt="Aures Bullet Logo" style="display:none;max-width:250px;margin:0 auto 8px;border-radius:12px;border:2px solid var(--gold);" onload="this.style.display='block';document.getElementById('svg-game-logo').style.display='none';" onerror="this.style.display='none';document.getElementById('svg-game-logo').style.display='block';">
+        <svg id="svg-game-logo" viewBox="0 0 420 175" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#f3d98b"/>
+              <stop offset="50%" stop-color="#c79a3b"/>
+              <stop offset="100%" stop-color="#7c5617"/>
+            </linearGradient>
+            <linearGradient id="waxGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#b82828"/>
+              <stop offset="100%" stop-color="#5e0e0e"/>
+            </linearGradient>
+          </defs>
+          <path d="M22,22 L398,22 L388,152 L32,152 Z" fill="#23160f" stroke="url(#goldGrad)" stroke-width="3"/>
+          <path d="M30,30 L390,30 L382,144 L38,144 Z" fill="none" stroke="#8a6830" stroke-width="1" stroke-dasharray="5,3"/>
+          <path d="M48,118 L98,66 L138,100 L195,46 L252,98 L302,60 L372,118 Z" fill="#3a2518" stroke="#c79a3b" stroke-width="1.5"/>
+          <circle cx="210" cy="64" r="24" fill="url(#waxGrad)" stroke="#ebd082" stroke-width="2"/>
+          <path d="M204,50 L216,50 L216,71 L210,80 L204,71 Z" fill="url(#goldGrad)"/>
+          <text x="210" y="109" text-anchor="middle" fill="#f3d98b" font-family="Georgia, serif" font-size="22" font-weight="bold" letter-spacing="1">AURES BULLET</text>
+          <text x="210" y="131" text-anchor="middle" fill="#e8d8b9" font-family="Georgia, serif" font-size="11.2" letter-spacing="0.5">SECRET OF THE TRAITOR AND THE COLONIZER</text>
+        </svg>
+      </div>
+
+      <div class="tteam-badge-wrap">
+        <img src="tteam-logo.png" alt="تامر Tteam" style="display:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);" onload="this.style.display='inline-block';document.getElementById('svg-tteam-badge').style.display='none';" onerror="this.style.display='none';document.getElementById('svg-tteam-badge').style.display='inline-block';">
+        <svg id="svg-tteam-badge" width="34" height="34" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="27" fill="#2a1910" stroke="#c79a3b" stroke-width="2.5"/>
+          <path d="M12,42 L24,22 L32,33 L41,18 L49,42 Z" fill="#8e1b1b" opacity="0.88"/>
+          <text x="30" y="34" text-anchor="middle" fill="#f3d98b" font-family="Georgia, serif" font-size="15" font-weight="bold">Tt</text>
+        </svg>
+        <span>هوية المطور: <strong>تامر Tteam © 2026 - جميع الحقوق محفوظة - Aures Bullet: Secret of the Traitor and the Colonizer</strong></span>
+      </div>
+
+      <p style="font-family:var(--font-serif);color:var(--parchment-dark);max-width:740px;margin:4px auto 12px;line-height:1.6;">
+        قيادة الأوراس السرية — لعبة استنتاج اجتماعي وبطاقات تكتيكية مستوحاة من تاريخ الثورة الجزائرية (من 4 إلى 15 لاعباً في جميع الأنماط).
+      </p>
+
+      <nav id="main-menu-content">
+        <button type="button" class="tac-btn primary" id="btn-menu-quick">🔥 بدء لعبة جديدة</button>
+        <button type="button" class="tac-btn" id="btn-menu-bots">🤖 اللعب ضد الروبوتات (سهل، متوسط، صعب)</button>
+        <button type="button" class="tac-btn" id="btn-menu-multi">🌐 غرف جماعية مع الأصدقاء (أونلاين / عدة أجهزة)</button>
+        <button type="button" class="tac-btn" id="btn-menu-passplay">📱 اللعب على هاتف واحد (Pass & Play)</button>
+        <button type="button" class="tac-btn olive" id="btn-menu-dossiers">🗂️ القوائم السرية وملف Aures Bullet</button>
+        <button type="button" class="tac-btn olive" id="btn-menu-revolution">🇩🇿 قصة الثورة الجزائرية (1954 – 1962)</button>
+        <button type="button" class="tac-btn" id="btn-menu-guide">📖 دليل اللعب</button>
+        <button type="button" class="tac-btn" id="btn-menu-audio">🔊 إعدادات الصوت</button>
+        <button type="button" class="tac-btn" id="btn-menu-about">🕯️ حول اللعبة</button>
+        <button type="button" class="tac-btn gold" id="btn-menu-ads">📢 قائمة الإعلانات الصغيرة وتحقيق الدخل</button>
+      </nav>
+
+      <div class="secret-code-strip">
+        <label for="secret-code-input" style="color:var(--gold-light);font-weight:bold;">🔐 كود قائمة الألعاب السرية المؤرخة:</label>
+        <input id="secret-code-input" class="vintage-input" type="text" dir="ltr" placeholder="أدخل الكود السري..." autocomplete="off">
+        <button type="button" class="tac-btn gold small" id="btn-unlock-secret-games">فتح القائمة السرية</button>
+        <span id="secret-code-msg" style="font-size:0.84rem;color:#ffb3b3;"></span>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-setup-bots" class="screen">
+    <div class="dossier-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <h2>🤖 اللعب ضد الروبوتات (4 – 15 لاعباً)</h2>
+        <button type="button" class="tac-btn small" data-back-home>↩ العودة للقائمة الرئيسية</button>
+      </div>
+      <div class="setup-grid">
+        <div class="form-group">
+          <label for="bots-player-name">اسمك الحركي:</label>
+          <input id="bots-player-name" class="vintage-input" type="text" value="الرائد سي الحواس">
+        </div>
+        <div class="form-group">
+          <label for="bots-count">عدد اللاعبين الإجمالي (إلزامي: 4 إلى 15):</label>
+          <input id="bots-count" class="vintage-input" type="number" min="4" max="15" value="6">
+        </div>
+        <div class="form-group">
+          <label for="bots-difficulty">مستوى الصعوبة:</label>
+          <select id="bots-difficulty" class="vintage-input">
+            <option value="easy">سهل</option>
+            <option value="medium" selected>متوسط</option>
+            <option value="hard">صعب</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <button type="button" class="tac-btn primary" id="btn-start-bots">🚀 بدء المهمة الآن</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-multiplayer" class="screen">
+    <div class="dossier-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <h2>🌐 غرف جماعية مع الأصدقاء (4 – 15 لاعباً)</h2>
+        <button type="button" class="tac-btn small" data-back-home>↩ العودة للقائمة الرئيسية</button>
+      </div>
+
+      <div class="parchment-box" style="margin:12px 0;font-size:0.88rem;">
+        <strong>📡 حالة الاتصال والمزامنة:</strong>
+        <span id="mp-sync-status">مزامنة فورية عبر BroadcastChannel و LocalStorage للنوافذ والتبويبات المتصلة.</span>
+        <br>
+        <small>تنبيه تقني: المزامنة الفورية المباشرة تعمل بين النوافذ/التبويبات المفتوحة على نفس المتصفح. الربط عن بُعد عبر شبكات مختلفة يتطلب ربط التطبيق بخادم إشارة (Signaling / WebSocket Server).</small>
+      </div>
+
+      <div class="setup-grid">
+        <div class="dossier-panel" style="padding:14px;">
+          <h3>إنشاء غرفة جديدة</h3>
+          <div class="form-group" style="margin-bottom:10px;">
+            <label for="mp-host-name">اسمك (المضيف):</label>
+            <input id="mp-host-name" class="vintage-input" type="text" value="قائد الخلية">
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label for="mp-capacity">سعة الغرفة (من 4 إلى 15):</label>
+            <input id="mp-capacity" class="vintage-input" type="number" min="4" max="15" value="6">
+          </div>
+          <button type="button" class="tac-btn primary" id="btn-mp-create">➕ إنشاء غرفة جديدة</button>
+        </div>
+
+        <div class="dossier-panel" style="padding:14px;">
+          <h3>الانضمام لغرفة</h3>
+          <div class="form-group" style="margin-bottom:10px;">
+            <label for="mp-join-name">اسمك:</label>
+            <input id="mp-join-name" class="vintage-input" type="text" value="عضو الخلية">
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label for="mp-join-code">رمز الغرفة (Room Code):</label>
+            <input id="mp-join-code" class="vintage-input" type="text" dir="ltr" placeholder="مثال: AURES-1954">
+          </div>
+          <button type="button" class="tac-btn olive" id="btn-mp-join">🚪 الانضمام لغرفة</button>
+        </div>
+      </div>
+
+      <div id="mp-room-lobby" class="dossier-panel" style="margin-top:16px;display:none;">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
+          <div>
+            <h3>غرفة العمليات: <span id="mp-room-code-display" dir="ltr" style="color:var(--gold-light);"></span></h3>
+            <small>السعة: <span id="mp-room-cap-display"></span> لاعباً | المتصلون: <span id="mp-room-count-display"></span></small>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="tac-btn small gold" id="btn-mp-copy-link">📋 نسخ رابط الدعوة</button>
+            <button type="button" class="tac-btn small" id="btn-mp-add-bot">🤖 إضافة روبوت للغرفة</button>
+            <button type="button" class="tac-btn small olive" id="btn-mp-ready">✅ تبديل الجاهزية</button>
+            <button type="button" class="tac-btn small primary" id="btn-mp-start">🚀 بدء الجولة</button>
+          </div>
+        </div>
+        <div id="mp-players-list" class="names-grid" style="margin-top:12px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-setup-passplay" class="screen">
+    <div class="dossier-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <h2>📱 اللعب على هاتف واحد (Pass & Play)</h2>
+        <button type="button" class="tac-btn small" data-back-home>↩ العودة للقائمة الرئيسية</button>
+      </div>
+      <p>أدخل عدد اللاعبين (إلزامي من 4 إلى 15 لاعباً) وأسماءهم. في كل دور سيظهر حاجز خصوصية لحماية بطاقات وهوية كل لاعب.</p>
+      <div class="form-group" style="max-width:320px;margin-bottom:12px;">
+        <label for="pp-count">عدد اللاعبين (4 – 15):</label>
+        <input id="pp-count" class="vintage-input" type="number" min="4" max="15" value="5">
+      </div>
+      <div id="pp-names-container" class="names-grid"></div>
+      <div style="margin-top:16px;">
+        <button type="button" class="tac-btn primary" id="btn-start-passplay">🚀 بدء اللعب على هذا الجهاز</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-game" class="screen">
+    <div class="wooden-table">
+      <div class="game-hud-top">
+        <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
+          <span class="hud-pill" id="hud-mode">الوضع: --</span>
+          <span class="hud-pill" id="hud-round">الجولة: 1</span>
+          <span class="hud-pill" id="hud-turn">الدور: --</span>
+          <span class="hud-pill" id="hud-deck">الكومة: 0</span>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <button type="button" class="tac-btn small gold" id="btn-show-my-role">👁️ هويتي السرية</button>
+          <button type="button" class="tac-btn small primary" id="btn-start-vote">⚖️ تصويت كشف الخائن</button>
+          <button type="button" class="tac-btn small" id="btn-exit-game">🏠 إنهاء والعودة</button>
+        </div>
+      </div>
+
+      <div id="players-ring" class="players-ring"></div>
+
+      <div class="table-center">
+        <div class="pile-slot">
+          <div class="game-card" id="draw-pile-card" role="button" tabindex="0" title="اضغط لسحب بطاقة وإنهاء الدور"></div>
+          <span style="font-size:0.83rem;color:var(--gold-light);">كومة السحب (النصر لنا)</span>
+        </div>
+        <div class="pile-slot">
+          <div class="game-card" id="discard-pile-card" style="cursor:default;"></div>
+          <span style="font-size:0.83rem;color:var(--gold-light);">آخر بطاقة ملعوبة</span>
+        </div>
+        <div style="max-width:270px;text-align:center;">
+          <p id="turn-instruction" style="font-size:0.88rem;margin:0 0 8px;">اختر بطاقة من يدك أو اسحب من الكومة.</p>
+          <button type="button" class="tac-btn small olive" id="btn-passplay-next" style="display:none;">🔒 إخفاء وتسليم الجهاز للاعب التالي</button>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:6px;">
+          <strong id="active-hand-title" style="color:var(--gold-light);">بطاقاتك السرية:</strong>
+          <small id="active-role-badge" style="color:#ffd98a;"></small>
+        </div>
+        <div id="player-hand"></div>
+      </div>
+
+      <div id="narrator-box">
+        <div id="narrator">🎙️ الراوي: مرحباً بكم في طاولة جبال الأوراس. انقر على أي بطاقة لسماع وقراءة دورها.</div>
+        <div id="card-footer-info" style="font-size:0.84rem;color:var(--parchment-dark);border-right:1px solid var(--gold);padding-right:10px;">
+          انقر على أي بطاقة لعرض شرحها التكتيكي.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-dossiers" class="screen">
+    <div class="dossier-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <h2>🗂️ القوائم السرية وأرشيف قيادة الأوراس</h2>
+        <button type="button" class="tac-btn small" data-back-home>↩ العودة للقائمة الرئيسية</button>
+      </div>
+
+      <div class="parchment-box" style="margin:14px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <h3 style="margin:0;color:var(--crimson);">📁 ملف التحقيق الرئيسي: Aures Bullet: Secret of the Traitor and the Colonizer</h3>
+          <button type="button" class="tac-btn small primary" id="btn-narrate-featured">🔊 استماع للملف بصوت الراوي</button>
+        </div>
+        <p id="featured-dossier-text" style="line-height:1.8;margin-top:10px;">
+          في أعالي جبال الأوراس، تتقاطع خيوط التحقيق السري حول رصاصة الأوراس الممهورة بالختم الأحمر. يسعى ضابط الاستعمار إلى تفكيك الخلايا الجبلية عبر عميل متسلل يحاول تزوير الوثائق وقلب الشكوك نحو المجاهدين الأبرياء. وحدها يقظة الفدائي والمجاهد وقوة الاستنتاج الاجتماعي كفيلة بإسقاط قناع الخائن وحماية خرائط المعابر قبل فوات الأوان.
+        </p>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <h3>🔐 الوثائق المشفرة وبطاقات الأرشيف المخفية</h3>
+        <small id="discovered-count-badge" style="color:var(--gold-light);"></small>
+      </div>
+      <div class="setup-grid" id="dossiers-cards-grid"></div>
+    </div>
+  </section>
+
+  <section id="screen-revolution" class="screen">
+    <div class="dossier-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <h2>🇩🇿 قصة الثورة الجزائرية (1 نوفمبر 1954 – 5 جويلية 1962)</h2>
+        <button type="button" class="tac-btn small" data-back-home>↩ العودة للقائمة الرئيسية</button>
+      </div>
+      <p style="color:var(--gold-light);">رحلة تاريخية ملهمة تربط روح الصمود والتنظيم السري في الجبال بأجواء لعبة Aures Bullet. اضغط "استماع" لسماع كل محطة بصوت الراوي.</p>
+      <div id="revolution-timeline"></div>
+    </div>
+  </section>
+
+  <section id="screen-secret-games" class="screen">
+    <div class="dossier-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div>
+          <h2 style="margin:0;">🎖️ قائمة الألعاب السرية المؤرخة بتاريخ الثورة الجزائرية</h2>
+          <small style="color:var(--gold-light);">تم الفتح بالكود الدقيق: <span dir="ltr">1/1/1-11-1954</span> | توقيع: تامر Tteam</small>
+        </div>
+        <button type="button" class="tac-btn small" data-back-home>↩ العودة للقائمة الرئيسية</button>
+      </div>
+
+      <div class="secret-tabs">
+        <button type="button" class="tac-btn primary" id="tab-sg-chess">♟️ شطرنج بنسختنا الخاصة (أرشيف 1 نوفمبر 1954)</button>
+        <button type="button" class="tac-btn olive" id="tab-sg-domino">🁣 دومينو بنسختنا الخاصة (أرشيف 20 أوت 1956)</button>
+        <button type="button" class="tac-btn gold" id="tab-sg-football">⚽ لعبة كرة قدم — 16 منتخباً (أرشيف 5 جويلية 1962)</button>
+      </div>
+
+      <div id="sg-panel-chess" class="dossier-panel" style="padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div>
+            <strong>♟️ شطرنج الأوراس — نسخة تامر Tteam (ملف 1 نوفمبر 1954)</strong>
+            <div id="chess-status" style="color:var(--gold-light);font-size:0.9rem;">الدور: الأبيض</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <label style="font-size:0.85rem;"><input type="checkbox" id="chess-vs-ai" checked> خصم آلي (الأسود)</label>
+            <button type="button" class="tac-btn small" id="btn-chess-reset">🔄 إعادة الرقعة</button>
+          </div>
+        </div>
+        <div id="chess-board" class="chess-board"></div>
+        <div id="chess-captured" style="text-align:center;margin-top:8px;font-size:0.88rem;color:var(--parchment-dark);"></div>
+      </div>
+
+      <div id="sg-panel-domino" class="dossier-panel" style="padding:14px;display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div>
+            <strong>🁣 دومينو الصومام — نسخة تامر Tteam (ملف 20 أوت 1956)</strong>
+            <div id="domino-status" style="color:var(--gold-light);font-size:0.9rem;">اختر قطعة مطابقة لأحد طرفي السلسلة.</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span class="hud-pill" id="domino-score">النقاط: أنت 0 - 0 الخصم</span>
+            <button type="button" class="tac-btn small" id="btn-domino-draw">🎴 سحب (<span id="domino-boneyard-count">14</span>)</button>
+            <button type="button" class="tac-btn small" id="btn-domino-pass">⏭️ تمرير</button>
+            <button type="button" class="tac-btn small primary" id="btn-domino-reset">🔄 جولة جديدة</button>
+          </div>
+        </div>
+        <div id="domino-ai-info" style="margin-bottom:8px;font-size:0.88rem;color:var(--parchment-dark);">قطع الخصم: 7</div>
+        <div id="domino-chain" class="domino-chain"></div>
+        <strong style="color:var(--gold-light);font-size:0.9rem;">قطعك المتاحة (انقر لوضعها):</strong>
+        <div id="domino-hand" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+      </div>
+
+      <div id="sg-panel-football" class="dossier-panel" style="padding:14px;display:none;">
+        <h3 style="text-align:center;margin-top:0;color:var(--gold-light);">⚽ كأس الحرية — 16 منتخباً فقط (ملف 5 جويلية 1962 | تامر Tteam)</h3>
+        <div class="fb-menu-bar">
+          <button type="button" class="tac-btn primary" id="fb-tab-play">قائمة اللعب</button>
+          <button type="button" class="tac-btn" id="fb-tab-settings">قائمة الإعدادات</button>
+          <button type="button" class="tac-btn olive" id="fb-tab-teams">قائمة تغيير المنتخب</button>
+        </div>
+
+        <div id="fb-view-play">
+          <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+            <span class="hud-pill" id="fb-scoreboard">الجزائر 0 - 0 فريق جبهة التحرير</span>
+            <span class="hud-pill" id="fb-timer">الوقت: 01:30</span>
+            <button type="button" class="tac-btn small gold" id="btn-fb-kickoff">▶ بدء / استئناف</button>
+            <button type="button" class="tac-btn small" id="btn-fb-reset-match">🔄 إعادة المباراة</button>
+          </div>
+          <canvas id="football-canvas" width="720" height="420"></canvas>
+          <div class="fb-touch-controls">
+            <button type="button" class="tac-btn small" data-fb-dir="left">⬅️</button>
+            <button type="button" class="tac-btn small" data-fb-dir="up">⬆️</button>
+            <button type="button" class="tac-btn small" data-fb-dir="down">⬇️</button>
+            <button type="button" class="tac-btn small" data-fb-dir="right">➡️</button>
+            <button type="button" class="tac-btn small olive" id="btn-fb-pass">🎯 تمرير</button>
+            <button type="button" class="tac-btn small primary" id="btn-fb-shoot">🔥 تسديد</button>
+          </div>
+          <p style="text-align:center;font-size:0.82rem;color:var(--parchment-dark);margin-top:6px;">
+            الحركة: الأسهم أو WASD | E للتمرير | مسافة للتسديد.
+          </p>
+        </div>
+
+        <div id="fb-view-settings" style="display:none;max-width:440px;margin:0 auto;">
+          <div class="form-group" style="margin-bottom:12px;">
+            <label for="fb-set-duration">مدة المباراة:</label>
+            <select id="fb-set-duration" class="vintage-input">
+              <option value="60">60 ثانية</option>
+              <option value="90" selected>90 ثانية</option>
+              <option value="180">180 ثانية</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label for="fb-set-diff">مستوى الصعوبة:</label>
+            <select id="fb-set-diff" class="vintage-input">
+              <option value="easy">سهل</option>
+              <option value="medium" selected>متوسط</option>
+              <option value="hard">صعب</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label><input type="checkbox" id="fb-set-sound" checked> تفعيل صوت صافرة وأهداف المباراة</label>
+          </div>
+        </div>
+
+        <div id="fb-view-teams" style="display:none;">
+          <p style="text-align:center;color:var(--gold-light);margin-top:0;">اختر منتخبك الحصري من بين 16 منتخباً فقط (تصميم تامر Tteam):</p>
+          <div id="fb-teams-grid" class="teams-16-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer id="official-footer">
+  تامر Tteam © 2026 - جميع الحقوق محفوظة - Aures Bullet: Secret of the Traitor and the Colonizer
+</footer>
+
+<div id="modal-privacy" class="modal-backdrop">
+  <div class="modal-card" style="text-align:center;">
+    <h2>🔒 حاجز الخصوصية السري</h2>
+    <p id="privacy-msg" style="font-size:1.1rem;color:var(--gold-light);margin:14px 0;"></p>
+    <p style="font-size:0.88rem;color:var(--parchment-dark);">تأكد من عدم نظر بقية اللاعبين إلى الشاشة قبل الضغط.</p>
+    <button type="button" class="tac-btn primary" id="btn-privacy-reveal">كشف دوري وبطاقاتي</button>
+  </div>
+</div>
+
+<div id="modal-info" class="modal-backdrop">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <h2 id="modal-info-title" style="margin:0;color:var(--gold-light);"></h2>
+      <button type="button" class="tac-btn small danger" id="btn-close-info">إغلاق</button>
+    </div>
+    <div id="modal-info-body" style="margin-top:14px;line-height:1.75;"></div>
+  </div>
+</div>
+
+<div id="modal-target" class="modal-backdrop">
+  <div class="modal-card">
+    <h2 id="modal-target-title" style="margin-top:0;color:var(--gold-light);">اختر هدفاً</h2>
+    <p id="modal-target-desc"></p>
+    <div id="modal-target-list" class="names-grid"></div>
+    <div style="margin-top:14px;text-align:left;">
+      <button type="button" class="tac-btn small" id="btn-cancel-target">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  function initApp() {
+    function bindClick(id, handler) {
+      try {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("click", function(ev) {
+          try {
+            handler.call(this, ev);
+          } catch (err) {
+            console.error("Error in button [" + id + "]:", err);
+          }
+        });
+      } catch (err) {
+        console.error("Failed to bind [" + id + "]:", err);
+      }
+    }
+
+    function safeStorageGet(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeStorageSet(key, val) {
+      try { localStorage.setItem(key, val); } catch (e) {}
+    }
+
+    try {
+      document.addEventListener("contextmenu", e => e.preventDefault());
+      document.addEventListener("keydown", e => {
+        if (
+          e.key === "F12" ||
+          (e.ctrlKey && e.shiftKey && ["I", "i", "J", "j", "C", "c"].includes(e.key)) ||
+          (e.ctrlKey && ["U", "u"].includes(e.key))
+        ) {
+          e.preventDefault();
+          return false;
+        }
+      });
+    } catch (err) {}
+
+    try {
+      const splash = document.getElementById("splash-screen");
+      const fill = document.getElementById("splash-fill");
+      const hideSplash = () => {
+        if (splash) {
+          splash.classList.add("hidden");
+          splash.style.display = "none";
+          splash.style.pointerEvents = "none";
+        }
+      };
+      bindClick("btn-skip-splash", hideSplash);
+      let prog = 0;
+      const timer = setInterval(() => {
+        prog += 50;
+        if (fill) fill.style.width = Math.min(prog, 100) + "%";
+        if (prog >= 100) {
+          clearInterval(timer);
+          setTimeout(hideSplash, 140);
+        }
+      }, 100);
+      setTimeout(hideSplash, 700);
+    } catch (e) {}
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, s => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[s]));
+    }
+
+    function showScreen(screenId) {
+      try {
+        if (screenId !== "screen-secret-games") {
+          FB.running = false;
+        }
+        document.querySelectorAll(".screen").forEach(sc => {
+          sc.classList.remove("active");
+          sc.style.display = "none";
+        });
+        const target = document.getElementById(screenId);
+        if (target) {
+          target.style.display = "block";
+          target.classList.add("active");
+          try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { window.scrollTo(0, 0); }
+        }
+      } catch (e) { console.error("showScreen error:", e); }
+    }
+
+    function clampPlayers(val, showAlert = false) {
+      const n = parseInt(val, 10);
+      if (isNaN(n) || n < 4) {
+        if (showAlert) alert("الحد الأدنى الإلزامي لعدد اللاعبين هو 4 لاعبين.");
+        return 4;
+      }
+      if (n > 15) {
+        if (showAlert) alert("الحد الأقصى الإلزامي لعدد اللاعبين هو 15 لاعباً.");
+        return 15;
+      }
+      return n;
+    }
+
+    const AudioState = {
+      speakerEnabled: true,
+      sfxEnabled: true,
+      micEnabled: false,
+      micStream: null,
+      speechRate: 1.0
+    };
+    let audioCtx = null;
+
+    function playTone(freq, dur = 0.15, type = "triangle", vol = 0.12) {
+      if (!AudioState.sfxEnabled || !AudioState.speakerEnabled) return;
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        if (!audioCtx) audioCtx = new Ctx();
+        if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    function speakArabic(text) {
+      try {
+        const narEl = document.getElementById("narrator");
+        if (narEl) narEl.textContent = "🎙️ الراوي: " + text;
+        if (!AudioState.speakerEnabled) return;
+        if ("speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined") {
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = "ar-SA";
+          u.rate = AudioState.speechRate;
+          const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+          const arVoice = voices.find(v => v.lang && v.lang.startsWith("ar"));
+          if (arVoice) u.voice = arVoice;
+          window.speechSynthesis.speak(u);
+        }
+      } catch (e) {}
+    }
+
+    bindClick("btn-vc-mic", async () => {
+      const btnMic = document.getElementById("btn-vc-mic");
+      const vcDot = document.getElementById("vc-dot");
+      const vcStatus = document.getElementById("vc-status-text");
+      try {
+        if (!AudioState.micEnabled) {
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            AudioState.micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          }
+          AudioState.micEnabled = true;
+          btnMic.textContent = "🎙️ الميكروفون: مفتوح";
+          btnMic.classList.add("active-on");
+          btnMic.classList.remove("muted");
+          vcDot.classList.add("live");
+          vcStatus.textContent = "الاتصال الصوتي للخلية: متصل (الميكروفون نشط)";
+          playTone(540, 0.1);
+        } else {
+          if (AudioState.micStream) AudioState.micStream.getTracks().forEach(t => t.stop());
+          AudioState.micStream = null;
+          AudioState.micEnabled = false;
+          btnMic.textContent = "🎙️ الميكروفون: مغلق";
+          btnMic.classList.remove("active-on");
+          btnMic.classList.add("muted");
+          vcDot.classList.remove("live");
+          vcStatus.textContent = "الاتصال الصوتي للخلية: مكتوم";
+        }
+      } catch (err) {
+        AudioState.micEnabled = false;
+        vcStatus.textContent = "الاتصال الصوتي: تعذر الوصول للميكروفون أو لم يُمنح الإذن";
+      }
+    });
+
+    bindClick("btn-vc-speaker", () => {
+      const btnSpeaker = document.getElementById("btn-vc-speaker");
+      AudioState.speakerEnabled = !AudioState.speakerEnabled;
+      if (AudioState.speakerEnabled) {
+        btnSpeaker.textContent = "🔊 الصوت والراوي: مفعل";
+        btnSpeaker.classList.add("active-on");
+        btnSpeaker.classList.remove("muted");
+        playTone(440, 0.12);
+      } else {
+        btnSpeaker.textContent = "🔇 الصوت والراوي: مكتوم";
+        btnSpeaker.classList.remove("active-on");
+        btnSpeaker.classList.add("muted");
+        try { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); } catch (e) {}
+      }
+    });
+
+    bindClick("btn-vc-leave", () => {
+      const btnMic = document.getElementById("btn-vc-mic");
+      const vcDot = document.getElementById("vc-dot");
+      const vcStatus = document.getElementById("vc-status-text");
+      try {
+        if (AudioState.micStream) AudioState.micStream.getTracks().forEach(t => t.stop());
+      } catch (e) {}
+      AudioState.micStream = null;
+      AudioState.micEnabled = false;
+      btnMic.textContent = "🎙️ الميكروفون: مغلق";
+      btnMic.classList.remove("active-on", "muted");
+      vcDot.classList.remove("live");
+      vcStatus.textContent = "الاتصال الصوتي للخلية: تمت مغادرة المكالمة";
+      playTone(240, 0.18);
+    });
+
+    const AdManager = {
+      enabled: true,
+      customText: "مساحة رعاية مهيأة: يمكنك ربط Google AdSense أو رسالة راعٍ مخصصة من إعدادات الإعلانات.",
+      customHtmlCode: ""
+    };
+
+    function loadAdConfig() {
+      try {
+        const saved = safeStorageGet("aures_ad_config");
+        if (saved) Object.assign(AdManager, JSON.parse(saved));
+      } catch (e) {}
+      applyAdUI();
+    }
+
+    function applyAdUI() {
+      try {
+        const banner = document.getElementById("ad-banner");
+        const bannerText = document.getElementById("ad-banner-text");
+        const slot = document.getElementById("mini-ad-render-slot");
+        if (banner) banner.classList.toggle("hidden", !AdManager.enabled);
+        if (bannerText) bannerText.innerHTML = `📢 ${escapeHtml(AdManager.customText)}`;
+        if (slot) {
+          if (AdManager.customHtmlCode && AdManager.customHtmlCode.trim() !== "") {
+            slot.innerHTML = AdManager.customHtmlCode;
+          } else {
+            slot.innerHTML = `<strong>حالة الشبكة الإعلانية (إعلان مهيأ):</strong><br>
+              ${escapeHtml(AdManager.customText)}<br>
+              <small style="color:#ffd885;">ملاحظة: لا توجد إعلانات وهمية. أدخل شيفرة AdSense أو نص الراعي الفعلي عند النشر عبر الإنترنت.</small>`;
+          }
+        }
+      } catch (e) {}
+    }
+
+    function openAdSettingsModal() {
+      openInfoModal("📢 إدارة الإعلانات الصغيرة وتحقيق الدخل (Monetization)", `
+        <div class="form-group" style="margin-bottom:10px;">
+          <label><input type="checkbox" id="cfg-ad-enable" ${AdManager.enabled ? "checked" : ""}> إظهار الشريط الإعلاني المتجاوب أعلى الشاشة</label>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label for="cfg-ad-text">نص الإعلان الصغير / رسالة الراعي المخصصة:</label>
+          <input id="cfg-ad-text" class="vintage-input" type="text" value="${escapeHtml(AdManager.customText)}">
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="cfg-ad-code">شيفرة HTML/AdSense المخصصة لحاوية الإعلان الصغيرة (اختياري):</label>
+          <textarea id="cfg-ad-code" class="vintage-input" rows="3" dir="ltr" placeholder="<ins class='adsbygoogle' ...></ins>">${escapeHtml(AdManager.customHtmlCode)}</textarea>
+        </div>
+        <button type="button" class="tac-btn primary" id="btn-save-ad-cfg">💾 حفظ وتطبيق إعدادات الإعلان</button>
+      `);
+      bindClick("btn-save-ad-cfg", () => {
+        AdManager.enabled = document.getElementById("cfg-ad-enable").checked;
+        AdManager.customText = document.getElementById("cfg-ad-text").value.trim() || AdManager.customText;
+        AdManager.customHtmlCode = document.getElementById("cfg-ad-code").value;
+        safeStorageSet("aures_ad_config", JSON.stringify(AdManager));
+        applyAdUI();
+        document.getElementById("modal-info").classList.remove("open");
+      });
+    }
+
+    bindClick("close-ad-btn", () => {
+      document.getElementById("ad-banner").classList.add("hidden");
+    });
+    bindClick("btn-toggle-mini-ads", () => {
+      document.getElementById("mini-ads-drawer").classList.toggle("open");
+    });
+    bindClick("btn-close-mini-ads", () => {
+      document.getElementById("mini-ads-drawer").classList.remove("open");
+    });
+    bindClick("btn-open-ad-settings", openAdSettingsModal);
+    bindClick("btn-menu-ads", () => {
+      document.getElementById("mini-ads-drawer").classList.add("open");
+    });
+
+    const ROLES = {
+      mujahid:   { id: "mujahid",   name: "مجاهد", team: "good", color: "#3d4d2c", desc: "حامي الجبال والوثائق السرية." },
+      fidaai:    { id: "fidaai",    name: "فدائي", team: "good", color: "#2b4d5a", desc: "منفذ العمليات الدقيقة وكاشف الخونة." },
+      traitor:   { id: "traitor",   name: "خائن",  team: "evil", color: "#8e1b1b", desc: "متسلل يخدم المستعمر ويسعى لإسقاط الخلية." },
+      informant: { id: "informant", name: "مخبر",  team: "evil", color: "#6b2b18", desc: "عين المستعمر التي ترصد تحركات المجاهدين." }
+    };
+
+    const CARD_TYPES = {
+      attack:  { type: "attack",  title: "هجوم (+2)",     color: "#8e1b1b", explain: "بطاقة هجوم (+2): تجبر اللاعب المستهدف على سحب بطاقتين ما لم يحمِ نفسه ببطاقة دفاع." },
+      reveal:  { type: "reveal",  title: "كشف دور (عين)", color: "#2c4c63", explain: "بطاقة كشف دور: تكشف لك الهوية السرية لأحد اللاعبين لمدة 5 ثوانٍ فقط ما لم يكن محمياً بدفاع." },
+      swap:    { type: "swap",    title: "تبديل دور",     color: "#7a5318", explain: "بطاقة تبديل دور: تجبر لاعبين عشوائيين على تبادل أوراقهما المتبقية في اليد." },
+      defense: { type: "defense", title: "دفاع (درع)",    color: "#3d5a2d", explain: "بطاقة دفاع: تحمي اللاعب من تأثير بطاقات الهجوم أو الكشف لدور واحد." },
+      normal:  { type: "normal",  title: "بطاقة عادية",   color: "#4d3826", explain: "بطاقة عادية: وثيقة ميدانية، لا تأثير خاص، يتم اللعب وتنتقل للدور التالي." }
+    };
+
+    function createCardBackSVG() {
+      return `<svg viewBox="0 0 120 175" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="116" height="171" rx="9" fill="#2b120e" stroke="#c79a3b" stroke-width="3"/>
+        <rect x="8" y="8" width="104" height="159" rx="6" fill="none" stroke="#c79a3b" stroke-width="1" stroke-dasharray="4,3"/>
+        <path d="M16,125 L38,88 L56,108 L78,76 L104,125 Z" fill="#4a1d17" stroke="#c79a3b" stroke-width="1.2"/>
+        <circle cx="60" cy="54" r="21" fill="#8e1b1b" stroke="#ebd082" stroke-width="1.8"/>
+        <path d="M48,54 L60,40 L72,54 L60,68 Z" fill="none" stroke="#ebd082" stroke-width="1.5"/>
+        <text x="60" y="148" text-anchor="middle" fill="#f3d98b" font-size="16" font-weight="bold" font-family="serif">النصر لنا</text>
+        <text x="60" y="25" text-anchor="middle" fill="#d8c195" font-size="8" font-family="serif">وثائق الأوراس</text>
+      </svg>`;
+    }
+
+    function createCardFrontSVG(card) {
+      const info = CARD_TYPES[card.type] || CARD_TYPES.normal;
+      let symbol = "";
+      if (card.type === "attack") {
+        symbol = `<path d="M52,55 L68,55 L68,95 L60,110 L52,95 Z" fill="#8e1b1b" stroke="#1a110a" stroke-width="2"/>
+                  <text x="60" y="46" text-anchor="middle" fill="#8e1b1b" font-size="16" font-weight="bold">+2</text>`;
+      } else if (card.type === "reveal") {
+        symbol = `<path d="M26,78 Q60,48 94,78 Q60,108 26,78 Z" fill="#ebdcb9" stroke="#2c4c63" stroke-width="3"/>
+                  <circle cx="60" cy="78" r="12" fill="#2c4c63"/><circle cx="60" cy="78" r="5" fill="#1a110a"/>`;
+      } else if (card.type === "swap") {
+        symbol = `<path d="M32,68 L78,68 L70,58 M88,88 L42,88 L50,98" fill="none" stroke="#7a5318" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+      } else if (card.type === "defense") {
+        symbol = `<path d="M36,52 L84,52 L84,82 Q60,110 36,82 Z" fill="#3d5a2d" stroke="#1a110a" stroke-width="2.5"/>
+                  <path d="M50,74 L58,82 L73,65" fill="none" stroke="#f3d98b" stroke-width="3.5"/>`;
+      } else {
+        symbol = `<rect x="38" y="52" width="44" height="54" rx="4" fill="#d8c195" stroke="#4d3826" stroke-width="2"/>
+                  <line x1="46" y1="65" x2="74" y2="65" stroke="#4d3826" stroke-width="2"/>
+                  <line x1="46" y1="77" x2="74" y2="77" stroke="#4d3826" stroke-width="2"/>
+                  <line x1="46" y1="89" x2="66" y2="89" stroke="#4d3826" stroke-width="2"/>`;
+      }
+      return `<svg viewBox="0 0 120 175" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="116" height="171" rx="9" fill="#efe2c6" stroke="${info.color}" stroke-width="3.5"/>
+        <rect x="8" y="8" width="104" height="159" rx="6" fill="none" stroke="#8a6830" stroke-width="1"/>
+        <rect x="10" y="10" width="100" height="24" rx="4" fill="${info.color}"/>
+        <text x="60" y="26" text-anchor="middle" fill="#fff8e7" font-size="11" font-weight="bold">${info.title}</text>
+        ${symbol}
+        <text x="60" y="138" text-anchor="middle" fill="#1d140e" font-size="10.5" font-weight="bold">${escapeHtml(card.label || info.title)}</text>
+        <text x="60" y="156" text-anchor="middle" fill="#6b4b2a" font-size="8.5">النصر لنا</text>
+      </svg>`;
+    }
+
+    const Game = {
+      mode: "bots",
+      difficulty: "medium",
+      players: [],
+      deck: [],
+      discard: [],
+      currentIndex: 0,
+      round: 1,
+      active: false,
+      passPlayRevealed: false,
+      discoveredDossiers: new Set(["doc-1"])
+    };
+
+    const BOT_NAMES = [
+      "سي الحواس", "حسيبة", "عميروش", "ديدوش", "بن بولعيد",
+      "العربي بن مهيدي", "زيغود يوسف", "كريم بلقاسم", "لالا نسومر",
+      "بوضياف", "آيت أحمد", "مراد", "خليفة", "ياسف"
+    ];
+
+    function buildDeck(count) {
+      const cards = [];
+      const copies = Math.max(2, Math.ceil(count / 2));
+      for (let c = 0; c < copies; c++) {
+        cards.push({ type: "attack", label: "كمين الأوراس (+2)" });
+        cards.push({ type: "attack", label: "طلقة تحذير (+2)" });
+        cards.push({ type: "reveal", label: "عين الاستخبارات" });
+        cards.push({ type: "reveal", label: "تفتيش البرقية" });
+        cards.push({ type: "swap", label: "تبادل الوثائق" });
+        cards.push({ type: "defense", label: "درع الجبل" });
+        cards.push({ type: "defense", label: "مخبأ سري" });
+        cards.push({ type: "normal", label: "خريطة معبر" });
+        cards.push({ type: "normal", label: "برقية سرية" });
+        cards.push({ type: "normal", label: "ختم الخلية" });
+      }
+      for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cards[i], cards[j]] = [cards[j], cards[i]];
+      }
+      return cards;
+    }
+
+    function assignRoles(count) {
+      const n = clampPlayers(count);
+      const evilCount = n >= 11 ? 3 : (n >= 6 ? 2 : 1);
+      const pool = [ROLES.traitor];
+      for (let i = 1; i < evilCount; i++) pool.push(i % 2 === 1 ? ROLES.informant : ROLES.traitor);
+      for (let i = pool.length; i < n; i++) pool.push(i % 3 === 0 ? ROLES.fidaai : ROLES.mujahid);
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      return pool;
+    }
+
+    function drawCardsFromDeck(n) {
+      const out = [];
+      for (let i = 0; i < n; i++) {
+        if (Game.deck.length === 0) {
+          if (Game.discard.length <= 1) Game.deck = buildDeck(Game.players.length);
+          else {
+            const top = Game.discard.pop();
+            Game.deck = Game.discard.splice(0);
+            Game.discard = [top];
+          }
+        }
+        out.push(Game.deck.pop());
+      }
+      return out;
+    }
+
+    function startMatch({ mode, playerNames, difficulty = "medium", botFlags = null }) {
+      const count = clampPlayers(playerNames.length, true);
+      const names = playerNames.slice(0, count);
+      const roles = assignRoles(count);
+
+      Game.mode = mode;
+      Game.difficulty = difficulty;
+      Game.round = 1;
+      Game.active = true;
+      Game.currentIndex = 0;
+      Game.passPlayRevealed = (mode !== "passplay");
+      Game.deck = buildDeck(count);
+      Game.discard = [];
+
+      Game.players = names.map((nm, idx) => ({
+        id: idx,
+        name: nm.trim() || `اللاعب ${idx + 1}`,
+        isBot: botFlags ? !!botFlags[idx] : (mode === "bots" ? idx !== 0 : false),
+        role: roles[idx],
+        hand: [],
+        shielded: false,
+        eliminated: false
+      }));
+
+      Game.players.forEach(p => { p.hand = drawCardsFromDeck(5); });
+      Game.discard.push(drawCardsFromDeck(1)[0]);
+
+      Game.discoveredDossiers.add("doc-2");
+      renderDossiers();
+
+      showScreen("screen-game");
+      playTone(340, 0.18);
+      speakArabic(`بدأت المهمة في جبال الأوراس بمشاركة ${count} لاعبين. تم توزيع خمس بطاقات لكل لاعب.`);
+      renderGame();
+      if (Game.mode === "passplay") openPassPlayPrivacyCurtain();
+      else maybeRunBotTurn();
+      syncMultiplayerState();
+    }
+
+    function getActiveViewer() {
+      if (Game.mode === "bots") return Game.players[0];
+      if (Game.mode === "multiplayer") return Game.players.find(p => p.name === MP.localName) || Game.players[0];
+      return Game.players[Game.currentIndex];
+    }
+
+    function renderGame() {
+      if (!Game.active) return;
+      const modeTxt = Game.mode === "bots" ? "ضد الروبوتات" : (Game.mode === "multiplayer" ? "غرف جماعية" : "هاتف واحد");
+      document.getElementById("hud-mode").textContent = "الوضع: " + modeTxt;
+      document.getElementById("hud-round").textContent = "الجولة: " + Game.round;
+      const currentP = Game.players[Game.currentIndex];
+      document.getElementById("hud-turn").textContent = "الدور: " + currentP.name;
+      document.getElementById("hud-deck").textContent = "الكومة: " + Game.deck.length;
+
+      const ring = document.getElementById("players-ring");
+      ring.innerHTML = "";
+      Game.players.forEach((p, idx) => {
+        const div = document.createElement("div");
+        div.className = "seat-card" +
+          (idx === Game.currentIndex ? " current-turn" : "") +
+          (p.eliminated ? " eliminated" : "") +
+          (p.shielded ? " shielded" : "");
+        let backs = "";
+        const vis = Math.min(p.hand.length, 7);
+        for (let b = 0; b < vis; b++) backs += `<div class="mini-back">النصر<br>لنا</div>`;
+        if (p.hand.length > 7) backs += `<span style="font-size:0.74rem;">+${p.hand.length - 7}</span>`;
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong>${p.isBot ? "🤖 " : "👤 "}${escapeHtml(p.name)}</strong>
+            <span>${p.shielded ? "🛡️" : ""}${p.eliminated ? "💀" : ""}</span>
+          </div>
+          <div style="color:var(--gold-light);font-size:0.76rem;">البطاقات: ${p.hand.length}</div>
+          <div class="mini-card-backs">${backs}</div>
+        `;
+        ring.appendChild(div);
+      });
+
+      document.getElementById("draw-pile-card").innerHTML = createCardBackSVG();
+      const topD = Game.discard[Game.discard.length - 1];
+      document.getElementById("discard-pile-card").innerHTML = topD ? createCardFrontSVG(topD) : createCardBackSVG();
+
+      const nextBtn = document.getElementById("btn-passplay-next");
+      nextBtn.style.display = (Game.mode === "passplay" && Game.passPlayRevealed) ? "inline-flex" : "none";
+
+      const viewer = getActiveViewer();
+      const isHumanTurn =
+        (Game.mode === "passplay" && Game.passPlayRevealed) ||
+        (Game.mode === "bots" && Game.currentIndex === 0) ||
+        (Game.mode === "multiplayer" && currentP.name === viewer.name && !currentP.isBot);
+
+      document.getElementById("active-hand-title").textContent = `بطاقات ${viewer.name} (${viewer.hand.length}):`;
+      document.getElementById("active-role-badge").textContent =
+        (Game.mode === "passplay" && !Game.passPlayRevealed) ? "الهوية مخفية" : `دورك السري: ${viewer.role.name}`;
+
+      document.getElementById("turn-instruction").textContent = isHumanTurn
+        ? "دورك الآن: انقر على بطاقة للعبها أو اسحب من الكومة."
+        : `⏳ الدور الآن لـ ${currentP.name}...`;
+
+      const handEl = document.getElementById("player-hand");
+      handEl.innerHTML = "";
+      if (Game.mode === "passplay" && !Game.passPlayRevealed) {
+        handEl.innerHTML = `<div style="padding:26px;color:var(--gold-light);">🔒 البطاقات مخفية لحماية خصوصية اللاعب الحالي.</div>`;
+        return;
+      }
+
+      viewer.hand.forEach((card, cIdx) => {
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "game-card";
+        cardDiv.innerHTML = createCardFrontSVG(card);
+        cardDiv.addEventListener("click", () => {
+          try {
+            const info = CARD_TYPES[card.type];
+            document.getElementById("card-footer-info").textContent = info.explain;
+            speakArabic(info.explain);
+            if (!isHumanTurn) {
+              document.getElementById("turn-instruction").textContent = "⏳ انتظر دورك للعب هذه البطاقة.";
+              return;
+            }
+            handleHumanPlayCard(viewer, cIdx);
+          } catch (err) { console.error(err); }
+        });
+        handEl.appendChild(cardDiv);
+      });
+    }
+
+    function handleHumanPlayCard(player, cardIdx) {
+      const card = player.hand[cardIdx];
+      if (!card) return;
+      if (card.type === "attack" || card.type === "reveal") {
+        const candidates = Game.players.filter(p => !p.eliminated && p.id !== player.id);
+        if (candidates.length === 0) return;
+        openTargetModal(
+          card.type === "attack" ? "🎯 اختر هدفاً للهجوم (+2)" : "👁️ اختر لاعباً لكشف دوره (5 ثوانٍ)",
+          card.type === "attack"
+            ? "سيُسحب للاعب المستهدف بطاقتان ما لم يحمِ نفسه ببطاقة دفاع."
+            : "سيُكشف لك دوره السري لخمس ثوانٍ فقط.",
+          candidates,
+          target => executeCardEffect(player, cardIdx, target)
+        );
+      } else {
+        executeCardEffect(player, cardIdx, null);
+      }
+    }
+
+    function executeCardEffect(player, cardIdx, target) {
+      const card = player.hand.splice(cardIdx, 1)[0];
+      Game.discard.push(card);
+      playTone(500, 0.14);
+
+      let msg = `${player.name} لعب بطاقة "${CARD_TYPES[card.type].title}". `;
+
+      if (card.type === "defense") {
+        player.shielded = true;
+        msg += `تم تفعيل الدرع الواقي لحماية ${player.name} لدور واحد.`;
+      } else if (card.type === "attack" && target) {
+        const defIdx = target.hand.findIndex(c => c.type === "defense");
+        if (target.shielded) {
+          target.shielded = false;
+          msg += `${target.name} صدّ الهجوم بالدرع المفعّل!`;
+        } else if (defIdx !== -1) {
+          Game.discard.push(target.hand.splice(defIdx, 1)[0]);
+          msg += `${target.name} فعّل بطاقة دفاع من يده وصدّ الهجوم (+2)!`;
+        } else {
+          target.hand.push(...drawCardsFromDeck(2));
+          msg += `${target.name} أُجبر على سحب بطاقتين!`;
+        }
+      } else if (card.type === "reveal" && target) {
+        if (target.shielded) {
+          msg += `${target.name} محمي بدفاع، تعذر كشف دوره!`;
+        } else {
+          msg += `${player.name} كشف دور ${target.name} السري سراً.`;
+          Game.discoveredDossiers.add("doc-3");
+          renderDossiers();
+          if (!player.isBot) showTemporaryRolePopup(target);
+        }
+      } else if (card.type === "swap") {
+        const alive = Game.players.filter(p => !p.eliminated);
+        if (alive.length >= 2) {
+          const i1 = Math.floor(Math.random() * alive.length);
+          let i2 = Math.floor(Math.random() * alive.length);
+          while (i2 === i1) i2 = Math.floor(Math.random() * alive.length);
+          const p1 = alive[i1], p2 = alive[i2];
+          const tmp = p1.hand;
+          p1.hand = p2.hand;
+          p2.hand = tmp;
+          msg += `تم تبادل الأوراق المتبقية بين ${p1.name} و ${p2.name}!`;
+        }
+      }
+
+      speakArabic(msg);
+      if (checkRoundEnd(player)) return;
+
+      if (Game.mode === "passplay") Game.passPlayRevealed = false;
+      advanceTurn();
+      syncMultiplayerState();
+    }
+
+    function showTemporaryRolePopup(target) {
+      openInfoModal(
+        "👁️ كشف الدور السري (5 ثوانٍ)",
+        `<div class="parchment-box" style="text-align:center;">
+          <h3>اللاعب: ${escapeHtml(target.name)}</h3>
+          <p style="font-size:1.3rem;color:${target.role.color};font-weight:bold;">الهوية: ${target.role.name}</p>
+          <p>${target.role.desc}</p>
+          <small>تُغلق هذه النافذة تلقائياً بعد 5 ثوانٍ...</small>
+        </div>`
+      );
+      setTimeout(() => {
+        const m = document.getElementById("modal-info");
+        if (m) m.classList.remove("open");
+      }, 5000);
+    }
+
+    function checkRoundEnd(player) {
+      if (player && player.hand.length === 0) {
+        Game.active = false;
+        Game.discoveredDossiers.add("doc-4");
+        renderDossiers();
+        const txt = `انتهت المرحلة! ${player.name} (${player.role.name}) أنهى أوراقه وحسم الجولة!`;
+        speakArabic(txt);
+        openInfoModal("🏆 نهاية الجولة", `<p style="font-size:1.08rem;">${txt}</p>`);
+        syncMultiplayerState();
+        return true;
+      }
+      const traitorsAlive = Game.players.filter(p => !p.eliminated && p.role.team === "evil").length;
+      const goodAlive = Game.players.filter(p => !p.eliminated && p.role.team === "good").length;
+      if (traitorsAlive === 0) {
+        Game.active = false;
+        const txt = "انتصر المجاهدون والفدائيون! تم كشف وإقصاء جميع الخونة والمخبرين في جبال الأوراس.";
+        speakArabic(txt);
+        openInfoModal("🇩🇿 النصر لنا!", `<p style="font-size:1.08rem;">${txt}</p>`);
+        syncMultiplayerState();
+        return true;
+      }
+      if (goodAlive <= traitorsAlive) {
+        Game.active = false;
+        const txt = "سيطر الخائن وأعوان المستعمر على الخلية! أعد الجولة لكشفهم مبكراً.";
+        speakArabic(txt);
+        openInfoModal("⚠️ سقوط الخلية", `<p style="font-size:1.08rem;">${txt}</p>`);
+        syncMultiplayerState();
+        return true;
+      }
+      return false;
+    }
+
+    function advanceTurn() {
+      if (!Game.active) return;
+      let guard = 0;
+      do {
+        Game.currentIndex = (Game.currentIndex + 1) % Game.players.length;
+        if (Game.currentIndex === 0) Game.round++;
+        guard++;
+      } while (Game.players[Game.currentIndex].eliminated && guard <= Game.players.length);
+
+      Game.players[Game.currentIndex].shielded = false;
+      renderGame();
+      if (Game.mode === "passplay") openPassPlayPrivacyCurtain();
+      else maybeRunBotTurn();
+    }
+
+    function maybeRunBotTurn() {
+      if (!Game.active) return;
+      if (Game.mode === "multiplayer" && !MP.isHost) return;
+      const p = Game.players[Game.currentIndex];
+      if (!p || !p.isBot) return;
+
+      setTimeout(() => {
+        if (!Game.active || Game.players[Game.currentIndex] !== p) return;
+        const others = Game.players.filter(o => !o.eliminated && o.id !== p.id);
+        if (others.length === 0) return;
+
+        const suspect = others[Math.floor(Math.random() * others.length)];
+        if (Math.random() < 0.5) {
+          const line = p.role.team === "evil"
+            ? `${p.name} يتهم: أرى أن ${suspect.name} يتصرف بريبة ويجب مراقبته!`
+            : `${p.name} يحذر: راقبوا ${suspect.name}، قد يكون الخائن المتسلل!`;
+          speakArabic(line);
+        }
+
+        if (p.hand.length === 0) { checkRoundEnd(p); return; }
+
+        let idx = 0;
+        if (Game.difficulty === "medium" || Game.difficulty === "hard") {
+          const atk = p.hand.findIndex(c => c.type === "attack");
+          const def = p.hand.findIndex(c => c.type === "defense");
+          const swp = p.hand.findIndex(c => c.type === "swap");
+          const rev = p.hand.findIndex(c => c.type === "reveal");
+          if (Game.difficulty === "hard" && atk !== -1) idx = atk;
+          else if (def !== -1 && !p.shielded && Math.random() < 0.45) idx = def;
+          else if (atk !== -1) idx = atk;
+          else if (swp !== -1) idx = swp;
+          else if (rev !== -1) idx = rev;
+          else idx = Math.floor(Math.random() * p.hand.length);
+        } else {
+          idx = Math.floor(Math.random() * p.hand.length);
+        }
+
+        const chosen = p.hand[idx];
+        let target = null;
+        if (chosen.type === "attack" || chosen.type === "reveal") {
+          if (Game.difficulty === "hard" && p.role.team === "evil") {
+            const goodTargets = others.filter(o => o.role.team === "good");
+            target = goodTargets.length ? goodTargets[0] : suspect;
+          } else {
+            target = suspect;
+          }
+        }
+        executeCardEffect(p, idx, target);
+      }, 1050);
+    }
+
+    bindClick("draw-pile-card", () => {
+      if (!Game.active) return;
+      if (Game.mode === "passplay" && !Game.passPlayRevealed) return;
+      const viewer = getActiveViewer();
+      const cur = Game.players[Game.currentIndex];
+      if (cur.id !== viewer.id || cur.isBot) return;
+      cur.hand.push(...drawCardsFromDeck(1));
+      playTone(390, 0.12);
+      speakArabic(`${cur.name} سحب بطاقة من الكومة.`);
+      if (Game.mode === "passplay") Game.passPlayRevealed = false;
+      advanceTurn();
+      syncMultiplayerState();
+    });
+
+    function openPassPlayPrivacyCurtain() {
+      const p = Game.players[Game.currentIndex];
+      const modal = document.getElementById("modal-privacy");
+      document.getElementById("privacy-msg").textContent = `مرر الجهاز إلى: ${p.name}`;
+      document.getElementById("btn-privacy-reveal").textContent = `أنا ${p.name} - كشف دوري وبطاقاتي`;
+      modal.classList.add("open");
+    }
+
+    bindClick("btn-privacy-reveal", () => {
+      document.getElementById("modal-privacy").classList.remove("open");
+      Game.passPlayRevealed = true;
+      renderGame();
+      const p = Game.players[Game.currentIndex];
+      speakArabic(`دور ${p.name}. هويتك وبطاقاتك مكشوفة لك الآن.`);
+    });
+
+    bindClick("btn-passplay-next", () => {
+      Game.passPlayRevealed = false;
+      renderGame();
+      advanceTurn();
+    });
+
+    bindClick("btn-show-my-role", () => {
+      if (!Game.active) return;
+      const v = getActiveViewer();
+      openInfoModal("👁️ بطاقة هويتك السرية", `
+        <div class="parchment-box" style="text-align:center;">
+          <h3>${escapeHtml(v.name)}</h3>
+          <p style="font-size:1.35rem;font-weight:bold;color:${v.role.color};">${v.role.name}</p>
+          <p>${v.role.desc}</p>
+        </div>
+      `);
+    });
+
+    bindClick("btn-start-vote", () => {
+      if (!Game.active) return;
+      const alive = Game.players.filter(p => !p.eliminated);
+      openTargetModal(
+        "⚖️ تصويت الخلية لكشف الخائن",
+        "اختر المشتبه به الذي تصوّت لعزله وإخراجه من الطاولة:",
+        alive,
+        (suspect) => {
+          suspect.eliminated = true;
+          const msg = `تم التصويت على عزل ${suspect.name}! تبين أن دوره السري كان: ${suspect.role.name}.`;
+          speakArabic(msg);
+          openInfoModal("⚖️ نتيجة التصويت", `<p style="font-size:1.08rem;">${msg}</p>`);
+          renderGame();
+          checkRoundEnd(null);
+          syncMultiplayerState();
+        }
+      );
+    });
+
+    bindClick("btn-exit-game", () => {
+      Game.active = false;
+      showScreen("screen-home");
+    });
+
+    function openInfoModal(title, html) {
+      document.getElementById("modal-info-title").textContent = title;
+      document.getElementById("modal-info-body").innerHTML = html;
+      document.getElementById("modal-info").classList.add("open");
+    }
+    bindClick("btn-close-info", () => {
+      document.getElementById("modal-info").classList.remove("open");
+    });
+    try {
+      const mInfo = document.getElementById("modal-info");
+      if (mInfo) mInfo.addEventListener("click", e => { if (e.target === mInfo) mInfo.classList.remove("open"); });
+      const mTarget = document.getElementById("modal-target");
+      if (mTarget) mTarget.addEventListener("click", e => { if (e.target === mTarget) mTarget.classList.remove("open"); });
+    } catch (e) {}
+
+    function openTargetModal(title, desc, list, onChoose) {
+      document.getElementById("modal-target-title").textContent = title;
+      document.getElementById("modal-target-desc").textContent = desc;
+      const container = document.getElementById("modal-target-list");
+      container.innerHTML = "";
+      list.forEach(p => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "tac-btn small";
+        b.textContent = p.name;
+        b.addEventListener("click", () => {
+          document.getElementById("modal-target").classList.remove("open");
+          onChoose(p);
+        });
+        container.appendChild(b);
+      });
+      document.getElementById("modal-target").classList.add("open");
+    }
+    bindClick("btn-cancel-target", () => {
+      document.getElementById("modal-target").classList.remove("open");
+    });
+
+    const MP = {
+      channel: null,
+      roomCode: null,
+      localName: "قائد الخلية",
+      capacity: 6,
+      members: [],
+      isHost: false
+    };
+
+    try {
+      if ("BroadcastChannel" in window) {
+        MP.channel = new BroadcastChannel("aures_bullet_mp_channel");
+        MP.channel.onmessage = ev => handleMPSignal(ev.data);
+      }
+      window.addEventListener("storage", ev => {
+        if (ev.key && ev.key.startsWith("aures_room_") && MP.roomCode && ev.key === "aures_room_" + MP.roomCode) {
+          try {
+            const room = JSON.parse(ev.newValue);
+            if (room) applyRoomSnapshot(room);
+          } catch (e) {}
+        }
+      });
+    } catch (e) {}
+
+    function saveRoomSnapshot(room) {
+      safeStorageSet("aures_room_" + room.code, JSON.stringify(room));
+      try { if (MP.channel) MP.channel.postMessage({ type: "ROOM_UPDATE", room }); } catch (e) {}
+    }
+
+    function applyRoomSnapshot(room) {
+      if (room.code !== MP.roomCode) return;
+      MP.capacity = clampPlayers(room.capacity);
+      MP.members = room.members || [];
+      renderRoomLobby();
+      if (room.gameState && room.gameState.active) {
+        Game.mode = "multiplayer";
+        Game.active = true;
+        Game.players = room.gameState.players;
+        Game.deck = room.gameState.deck;
+        Game.discard = room.gameState.discard;
+        Game.currentIndex = room.gameState.currentIndex;
+        Game.round = room.gameState.round;
+        showScreen("screen-game");
+        renderGame();
+      }
+    }
+
+    function handleMPSignal(data) {
+      if (!data) return;
+      if (data.type === "ROOM_UPDATE" && data.room) applyRoomSnapshot(data.room);
+    }
+
+    function syncMultiplayerState() {
+      if (Game.mode !== "multiplayer" || !MP.roomCode) return;
+      try {
+        const raw = safeStorageGet("aures_room_" + MP.roomCode);
+        const room = raw ? JSON.parse(raw) : { code: MP.roomCode, capacity: MP.capacity, members: MP.members };
+        room.gameState = {
+          active: Game.active,
+          players: Game.players,
+          deck: Game.deck,
+          discard: Game.discard,
+          currentIndex: Game.currentIndex,
+          round: Game.round
+        };
+        saveRoomSnapshot(room);
+      } catch (e) {}
+    }
+
+    function renderRoomLobby() {
+      const lobby = document.getElementById("mp-room-lobby");
+      lobby.style.display = "block";
+      document.getElementById("mp-room-code-display").textContent = MP.roomCode;
+      document.getElementById("mp-room-cap-display").textContent = MP.capacity;
+      document.getElementById("mp-room-count-display").textContent = MP.members.length;
+      const list = document.getElementById("mp-players-list");
+      list.innerHTML = "";
+      MP.members.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "seat-card";
+        card.innerHTML = `<strong>${m.isBot ? "🤖 " : "👤 "}${escapeHtml(m.name)}</strong>
+          <div style="color:${m.ready ? "#8be072" : "#ffd27d"};">${m.ready ? "✅ جاهز" : "⏳ في الانتظار"}</div>`;
+        list.appendChild(card);
+      });
+    }
+
+    bindClick("btn-mp-create", () => {
+      const hostName = document.getElementById("mp-host-name").value.trim() || "قائد الخلية";
+      const cap = clampPlayers(document.getElementById("mp-capacity").value, true);
+      document.getElementById("mp-capacity").value = cap;
+      const code = "AURES-" + Math.floor(1000 + Math.random() * 9000);
+      MP.roomCode = code;
+      MP.localName = hostName;
+      MP.capacity = cap;
+      MP.isHost = true;
+      MP.members = [{ name: hostName, ready: true, isBot: false }];
+      saveRoomSnapshot({ code, capacity: cap, members: MP.members, gameState: null });
+      document.getElementById("mp-sync-status").textContent = `متصل بالغرفة ${code} — المزامنة الفورية نشطة.`;
+      renderRoomLobby();
+    });
+
+    bindClick("btn-mp-join", () => {
+      const name = document.getElementById("mp-join-name").value.trim() || "عضو الخلية";
+      const code = document.getElementById("mp-join-code").value.trim().toUpperCase();
+      if (!code) { alert("يرجى إدخال رمز الغرفة."); return; }
+      let room = null;
+      try {
+        const raw = safeStorageGet("aures_room_" + code);
+        if (raw) room = JSON.parse(raw);
+      } catch (e) {}
+      if (!room) room = { code, capacity: 6, members: [], gameState: null };
+      if (room.members.length >= room.capacity) { alert("الغرفة ممتلئة حالياً."); return; }
+      if (!room.members.some(m => m.name === name)) {
+        room.members.push({ name, ready: true, isBot: false });
+      }
+      MP.roomCode = code;
+      MP.localName = name;
+      MP.isHost = false;
+      MP.capacity = clampPlayers(room.capacity);
+      MP.members = room.members;
+      saveRoomSnapshot(room);
+      document.getElementById("mp-sync-status").textContent = `تم الانضمام للغرفة ${code} والمزامنة الفورية مفعّلة.`;
+      renderRoomLobby();
+    });
+
+    bindClick("btn-mp-copy-link", async () => {
+      const link = `${location.href.split("#")[0]}#room=${MP.roomCode}`;
+      try { await navigator.clipboard.writeText(link); } catch (e) {}
+      alert(`تم نسخ رابط الدعوة:\n${link}\nرمز الغرفة: ${MP.roomCode}`);
+    });
+
+    bindClick("btn-mp-add-bot", () => {
+      if (!MP.roomCode) return;
+      if (MP.members.length >= MP.capacity) { alert("وصلت الغرفة إلى السعة القصوى."); return; }
+      const bName = BOT_NAMES[MP.members.length % BOT_NAMES.length] + " (آلي)";
+      MP.members.push({ name: bName, ready: true, isBot: true });
+      saveRoomSnapshot({ code: MP.roomCode, capacity: MP.capacity, members: MP.members, gameState: null });
+      renderRoomLobby();
+    });
+
+    bindClick("btn-mp-ready", () => {
+      const me = MP.members.find(m => m.name === MP.localName);
+      if (me) me.ready = !me.ready;
+      saveRoomSnapshot({ code: MP.roomCode, capacity: MP.capacity, members: MP.members, gameState: null });
+      renderRoomLobby();
+    });
+
+    bindClick("btn-mp-start", () => {
+      if (MP.members.length < 4) {
+        alert("الحد الأدنى الإلزامي لبدء الجولة هو 4 لاعبين. أضف لاعبين أو روبوتات للوصول إلى 4 على الأقل.");
+        return;
+      }
+      const count = clampPlayers(MP.members.length, true);
+      const list = MP.members.slice(0, count);
+      startMatch({
+        mode: "multiplayer",
+        playerNames: list.map(m => m.name),
+        botFlags: list.map(m => !!m.isBot)
+      });
+    });
+
+    try {
+      if (location.hash && location.hash.startsWith("#room=")) {
+        document.getElementById("mp-join-code").value = location.hash.replace("#room=", "").trim().toUpperCase();
+      }
+    } catch (e) {}
+
+    function renderPassPlayInputs() {
+      const countEl = document.getElementById("pp-count");
+      const box = document.getElementById("pp-names-container");
+      if (!countEl || !box) return;
+      const count = clampPlayers(countEl.value);
+      countEl.value = count;
+      box.innerHTML = "";
+      for (let i = 0; i < count; i++) {
+        const inp = document.createElement("input");
+        inp.type = "text";
+        inp.className = "vintage-input";
+        inp.value = `اللاعب ${i + 1}`;
+        inp.placeholder = `اسم اللاعب ${i + 1}`;
+        box.appendChild(inp);
+      }
+    }
+
+    try {
+      const ppCountEl = document.getElementById("pp-count");
+      if (ppCountEl) ppCountEl.addEventListener("change", renderPassPlayInputs);
+      renderPassPlayInputs();
+    } catch (e) {}
+
+    bindClick("btn-start-passplay", () => {
+      const ppCountEl = document.getElementById("pp-count");
+      const count = clampPlayers(ppCountEl.value, true);
+      ppCountEl.value = count;
+      const inputs = Array.from(document.querySelectorAll("#pp-names-container input")).slice(0, count);
+      const names = inputs.map((el, i) => el.value.trim() || `اللاعب ${i + 1}`);
+      startMatch({ mode: "passplay", playerNames: names });
+    });
+
+    try {
+      const botsCountEl = document.getElementById("bots-count");
+      if (botsCountEl) {
+        botsCountEl.addEventListener("change", e => {
+          e.target.value = clampPlayers(e.target.value, true);
+        });
+      }
+    } catch (e) {}
+
+    bindClick("btn
